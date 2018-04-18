@@ -5,7 +5,8 @@ import {
   View,
   TextInput,
   ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
+  AsyncStorage
 } from 'react-native';
 
 import Note from './app/components/note';
@@ -18,6 +19,13 @@ export default class TuDuApp extends React.Component {
     ],
     noteText: ''
   }
+
+  componentDidMount = () => AsyncStorage.getItem('noteArray').then((value) => {
+    if (value) {
+      var data = JSON.parse(value)
+      this.setState({ noteArray: data });
+    }
+  });
 
   render() {
     let notes = this.state.noteArray.map((val, key) => {
@@ -35,13 +43,13 @@ export default class TuDuApp extends React.Component {
         </ScrollView>
 
         <View style={styles.footer}>
-          <TouchableOpacity onPress={this.addNote.bind(this)} style={styles.addButton}>
+          <TouchableOpacity onPress={ () => this.addNote() } style={styles.addButton}>
             <Text style={styles.addButtonText}>+</Text>
           </TouchableOpacity>
 
           <TextInput
             style={styles.textInput}
-            placeholder='Enter you note content...'
+            placeholder='Enter your note content...'
             placeholderTextColor='white'
             underlineColorAndroid='transparent'
             onChangeText={(noteText) => this.setState({noteText})}
@@ -60,14 +68,24 @@ export default class TuDuApp extends React.Component {
         'note': this.state.noteText,
         'date': `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
       });
-      this.setState({ noteArray: this.state.noteArray });
+      this.syncArrayNote(this.state.noteArray);
       this.setState({ noteText: '' });
+    }
+  }
+
+  async syncArrayNote(noteArray) {
+    this.setState({ noteArray: noteArray });
+    try {
+      var jsonData = JSON.stringify(noteArray);
+      await AsyncStorage.setItem('noteArray',  jsonData);
+    } catch (error) {
+      console.log("Error");
     }
   }
 
   deleteMethod(key) {
     this.state.noteArray.splice(key, 1);
-    this.setState({ noteArray: this.state.noteArray });
+    this.syncArrayNote(this.state.noteArray);
   }
 }
 
@@ -76,7 +94,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   header: {
-    backgroundColor: '#E91E63',
+    backgroundColor: '#009688',
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomColor: '#ddd',
@@ -98,7 +116,7 @@ const styles = StyleSheet.create({
     right: 0
   },
   addButton: {
-    backgroundColor: '#E91E63',
+    backgroundColor: '#009688',
     width: 50,
     height: 50,
     borderRadius: 50,
