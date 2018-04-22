@@ -31,10 +31,11 @@ export default class TuDuApp extends React.Component {
     let notes = this.state.noteArray.map((val, key) => {
       return <Note 
         key={key}
-        keyval={key}
+        keyVal={key}
         val={val}
         deleteMethod={ () => this.deleteMethod(key) }
         toggleDoneMethod = { () => this.toggleDoneMethod(key) }
+        updateMethod={this.updateMethod.bind(this)}
       />
     });
 
@@ -69,10 +70,8 @@ export default class TuDuApp extends React.Component {
 
   addNote() {
     if (this.state.noteText) {
-      var date = new Date();
       this.state.noteArray.push({
         'note': this.state.noteText,
-        'date': `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`,
         'isDone': false
       });
       this.syncArrayNote(this.state.noteArray);
@@ -80,8 +79,8 @@ export default class TuDuApp extends React.Component {
     }
   }
 
-  deleteMethod(key) {
-    this.state.noteArray.splice(key, 1);
+  updateMethod(key, content) {
+    this.state.noteArray[key].note = content;
     this.syncArrayNote(this.state.noteArray);
   }
 
@@ -91,7 +90,7 @@ export default class TuDuApp extends React.Component {
   }
 
   toggleDoneMethod(key) {
-    var note = this.state.noteArray[key];
+    let note = this.state.noteArray[key];
     note.isDone = !note.isDone;
     this.syncArrayNote(this.state.noteArray);
   }
@@ -99,7 +98,7 @@ export default class TuDuApp extends React.Component {
   async syncArrayNote(noteArray) {
     this.setState({ noteArray: noteArray });
     try {
-      var jsonData = JSON.stringify(noteArray);
+      let jsonData = JSON.stringify(noteArray);
       await AsyncStorage.setItem('noteArray',  jsonData);
     } catch (error) {
       console.log("Error");
