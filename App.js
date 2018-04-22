@@ -29,7 +29,13 @@ export default class TuDuApp extends React.Component {
 
   render() {
     let notes = this.state.noteArray.map((val, key) => {
-      return <Note key={key} keyval={key} val={val} deleteMethod={ () => this.deleteMethod(key) } />
+      return <Note 
+        key={key}
+        keyval={key}
+        val={val}
+        deleteMethod={ () => this.deleteMethod(key) }
+        toggleDoneMethod = { () => this.toggleDoneMethod(key) }
+      />
     });
 
     return (
@@ -66,11 +72,28 @@ export default class TuDuApp extends React.Component {
       var date = new Date();
       this.state.noteArray.push({
         'note': this.state.noteText,
-        'date': `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
+        'date': `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`,
+        'isDone': false
       });
       this.syncArrayNote(this.state.noteArray);
       this.setState({ noteText: '' });
     }
+  }
+
+  deleteMethod(key) {
+    this.state.noteArray.splice(key, 1);
+    this.syncArrayNote(this.state.noteArray);
+  }
+
+  deleteMethod(key) {
+    this.state.noteArray.splice(key, 1);
+    this.syncArrayNote(this.state.noteArray);
+  }
+
+  toggleDoneMethod(key) {
+    var note = this.state.noteArray[key];
+    note.isDone = !note.isDone;
+    this.syncArrayNote(this.state.noteArray);
   }
 
   async syncArrayNote(noteArray) {
@@ -81,11 +104,6 @@ export default class TuDuApp extends React.Component {
     } catch (error) {
       console.log("Error");
     }
-  }
-
-  deleteMethod(key) {
-    this.state.noteArray.splice(key, 1);
-    this.syncArrayNote(this.state.noteArray);
   }
 }
 
