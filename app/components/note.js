@@ -40,7 +40,7 @@ export default class Note extends React.Component {
                     <Text style={styles.noteEditText}>E</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={this.props.toggleDoneMethod}
+                    onPress={() => this.toggleDone()}
                     style={[styles.noteCheckDone, isEditing ? styles.disabledButton : null]}
                     disabled={isEditing}
                 >
@@ -56,6 +56,10 @@ export default class Note extends React.Component {
 
             </View>
         );
+    }
+
+    toggleDone() {
+        this.props.toggleDoneMethod(this.props.keyVal);
     }
 
     toggleEdit() {
